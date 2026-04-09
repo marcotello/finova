@@ -42,8 +42,5 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 
-# OpenAPI Generated Files
-/src/app/core/api
-
 # IDEs
 .vscode/
