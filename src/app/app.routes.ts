@@ -27,6 +27,14 @@ export const routes: Routes = [
             {
                 path: 'goals',
                 loadComponent: () => import('./features/goals/goals-page/goals-page').then(m => m.GoalsPage)
+            },
+            {
+                path: 'transactions',
+                loadComponent: () => import('./features/transactions/transactions-page/transactions-page').then(m => m.TransactionsPage)
+            },
+            {
+                path: 'analytics',
+                loadComponent: () => import('./features/analytics/analytics-page/analytics-page').then(m => m.AnalyticsPage)
             }
         ]
     },

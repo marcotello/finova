@@ -1,0 +1,195 @@
+<div class="p-4 lg:p-6">
+  <!-- Header -->
+  <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-foreground">Analytics</h1>
+      <p class="text-sm text-muted-foreground">
+        Deep dive into your financial data
+      </p>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="flex items-center rounded-lg border border-border bg-card p-1">
+        @for (period of periods; track period) {
+          <button
+            (click)="selectPeriod(period)"
+            class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+            [ngClass]="
+              selectedPeriod() === period
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:text-foreground'
+            "
+          >
+            {{ period }}
+          </button>
+        }
+      </div>
+      <button class="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-card-foreground hover:bg-muted">
+        <ng-icon name="lucideDownload" class="h-4 w-4"></ng-icon>
+        Export
+      </button>
+    </div>
+  </div>
+
+  <!-- Key Metrics -->
+  <div class="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="rounded-xl border border-border bg-card p-4 shadow-sm">
+      <p class="text-sm text-muted-foreground">Total Income</p>
+      <p class="text-2xl font-bold text-chart-1">
+        {{ totalIncome | currency:'MXN':'symbol-narrow':'1.0-0' }}
+      </p>
+      <div class="mt-2 flex items-center gap-1 text-sm">
+        <ng-icon name="lucideArrowUpRight" class="h-4 w-4 text-chart-1"></ng-icon>
+        <span class="text-chart-1">+12.5%</span>
+        <span class="text-muted-foreground">vs last year</span>
+      </div>
+    </div>
+    <div class="rounded-xl border border-border bg-card p-4 shadow-sm">
+      <p class="text-sm text-muted-foreground">Total Expenses</p>
+      <p class="text-2xl font-bold text-destructive">
+        {{ totalExpenses | currency:'MXN':'symbol-narrow':'1.0-0' }}
+      </p>
+      <div class="mt-2 flex items-center gap-1 text-sm">
+        <ng-icon name="lucideArrowDownRight" class="h-4 w-4 text-chart-1"></ng-icon>
+        <span class="text-chart-1">-5.2%</span>
+        <span class="text-muted-foreground">vs last year</span>
+      </div>
+    </div>
+    <div class="rounded-xl border border-border bg-card p-4 shadow-sm">
+      <p class="text-sm text-muted-foreground">Net Savings</p>
+      <p class="text-2xl font-bold text-card-foreground">
+        {{ totalIncome - totalExpenses | currency:'MXN':'symbol-narrow':'1.0-0' }}
+      </p>
+      <div class="mt-2 flex items-center gap-1 text-sm">
+        <ng-icon name="lucideTrendingUp" class="h-4 w-4 text-chart-1"></ng-icon>
+        <span class="text-chart-1">+18.3%</span>
+        <span class="text-muted-foreground">vs last year</span>
+      </div>
+    </div>
+    <div class="rounded-xl border border-border bg-card p-4 shadow-sm">
+      <p class="text-sm text-muted-foreground">Savings Rate</p>
+      <p class="text-2xl font-bold text-card-foreground">
+        {{ savingsRate }}%
+      </p>
+      <div class="mt-2 flex items-center gap-1 text-sm">
+        <ng-icon name="lucideTrendingUp" class="h-4 w-4 text-chart-1"></ng-icon>
+        <span class="text-muted-foreground">Target: 30%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Grid -->
+  <div class="grid gap-6 lg:grid-cols-2">
+    <!-- Income vs Expenses (CSS Mock Bar Chart) -->
+    <div class="rounded-xl border border-border bg-card p-5 shadow-sm">
+      <h3 class="mb-4 text-lg font-semibold text-card-foreground">
+        Income vs Expenses
+      </h3>
+      <div class="h-72 w-full flex flex-col justify-end">
+        <!-- Chart Bars Container -->
+        <div class="flex-1 flex items-end justify-between gap-1 w-full relative pt-6 border-b border-border">
+          @for (data of monthlyData; track data.month) {
+            <div class="flex flex-col items-center justify-end h-full w-full gap-1 group relative">
+              <!-- Income Bar -->
+              <div 
+                class="w-full max-w-3 bg-chart-1 rounded-t-sm transition-all group-hover:opacity-80"
+                [style.height.%]="(data.income / maxMonthlyValue) * 100"
+              ></div>
+              <!-- Expense Bar -->
+              <div 
+                class="w-full max-w-3 bg-chart-3 rounded-t-sm transition-all group-hover:opacity-80"
+                [style.height.%]="(data.expenses / maxMonthlyValue) * 100"
+              ></div>
+
+              <!-- Tooltip (Visible on Hover) -->
+              <div class="absolute -top-12 left-1/2 -translate-x-1/2 hidden group-hover:flex flex-col items-center bg-card border border-border shadow-lg p-2 rounded text-xs z-10 w-24">
+                <span class="font-bold text-chart-1">{{ data.income | currency:'MXN':'symbol-narrow':'1.0-0' }}</span>
+                <span class="font-bold text-chart-3">{{ data.expenses | currency:'MXN':'symbol-narrow':'1.0-0' }}</span>
+              </div>
+            </div>
+          }
+        </div>
+        <!-- X-Axis Labels -->
+        <div class="flex items-center justify-between mt-2 px-1">
+          @for (data of monthlyData; track data.month) {
+            <span class="text-xs text-muted-foreground">{{ data.month }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Spending by Category (CSS Mock Pie Chart) -->
+    <div class="rounded-xl border border-border bg-card p-5 shadow-sm">
+      <h3 class="mb-4 text-lg font-semibold text-card-foreground">
+        Spending by Category
+      </h3>
+      <div class="flex items-center gap-6 h-72">
+        <div class="h-48 w-48 mx-auto relative flex items-center justify-center">
+          <!-- The CSS Pie Chart (Conic Gradient) -->
+          <div 
+            class="absolute inset-0 rounded-full"
+            [style.background]="pieChartConicGradient"
+          ></div>
+          <!-- Inner circle to make it a donut chart (recharts innerRadius=50) -->
+          <div class="absolute inset-4 rounded-full bg-card"></div>
+        </div>
+        <div class="flex-1 space-y-3">
+          @for (category of categoryData; track category.name) {
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div
+                  class="h-3 w-3 rounded-full"
+                  [style.backgroundColor]="category.color"
+                ></div>
+                <span class="text-sm text-card-foreground">
+                  {{ category.name }}
+                </span>
+              </div>
+              <span class="text-sm font-medium text-card-foreground">
+                {{ category.value | currency:'MXN':'symbol-narrow':'1.0-0' }}
+              </span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Net Worth Trend (CSS Mock Area Chart) -->
+    <div class="rounded-xl border border-border bg-card p-5 shadow-sm lg:col-span-2">
+      <h3 class="mb-4 text-lg font-semibold text-card-foreground">
+        Net Worth Trend
+      </h3>
+      <div class="h-72 flex flex-col justify-end">
+        <div class="relative w-full h-full flex items-end border-b border-border pl-12 pb-2">
+          <!-- Y-Axis Mocks -->
+          <div class="absolute left-0 top-0 bottom-6 flex flex-col justify-between text-xs text-muted-foreground w-10">
+            <span>500k</span>
+            <span>450k</span>
+            <span>400k</span>
+            <span>350k</span>
+          </div>
+
+          <!-- Pure CSS Area Chart Mock representing upward trend curve -->
+          <div class="relative w-full h-[60%] mt-auto flex items-end opacity-90 overflow-hidden rounded-t-xl group">
+             <!-- Top line stroke -->
+             <svg class="absolute inset-0 h-full w-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+               <defs>
+                  <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stop-color="var(--primary)" stop-opacity="0.3"></stop>
+                    <stop offset="95%" stop-color="var(--primary)" stop-opacity="0"></stop>
+                  </linearGradient>
+               </defs>
+               <path d="M0,80 Q20,75 30,60 T60,30 T100,5 L100,100 L0,100 Z" fill="url(#areaGradient)"></path>
+               <path d="M0,80 Q20,75 30,60 T60,30 T100,5" fill="none" stroke="var(--primary)" stroke-width="2"></path>
+             </svg>
+          </div>
+        </div>
+        <!-- X-Axis Labels -->
+        <div class="flex items-center justify-between ml-12 mt-2">
+          @for (item of netWorthTrend; track item.month) {
+            <span class="text-xs text-muted-foreground">{{ item.month }}</span>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
