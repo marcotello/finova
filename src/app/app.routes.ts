@@ -35,6 +35,10 @@ export const routes: Routes = [
             {
                 path: 'analytics',
                 loadComponent: () => import('./features/analytics/analytics-page/analytics-page').then(m => m.AnalyticsPage)
+            },
+            {
+                path: 'documents',
+                loadComponent: () => import('./features/documents/documents-page/documents-page').then(m => m.DocumentsPage)
             }
         ]
     },

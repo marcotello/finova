@@ -1,0 +1,127 @@
+<div class="p-4 lg:p-6">
+  <!-- Header -->
+  <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-foreground">Documents</h1>
+      <p class="text-sm text-muted-foreground">
+        Store and organize your financial documents
+      </p>
+    </div>
+    <button class="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+      <ng-icon name="lucideUpload" class="h-4 w-4"></ng-icon>
+      Upload Document
+    </button>
+  </div>
+
+  <!-- Stats -->
+  <div class="mb-6 grid gap-4 sm:grid-cols-3">
+    <div class="rounded-xl border border-border bg-card p-4 shadow-sm">
+      <div class="flex items-center gap-2">
+        <ng-icon name="lucideFolderOpen" class="h-5 w-5 text-primary"></ng-icon>
+        <p class="text-sm text-muted-foreground">Total Documents</p>
+      </div>
+      <p class="mt-2 text-2xl font-bold text-card-foreground">
+        {{ documents.length }}
+      </p>
+    </div>
+    <div class="rounded-xl border border-border bg-card p-4 shadow-sm">
+      <div class="flex items-center gap-2">
+        <ng-icon name="lucideHardDrive" class="h-5 w-5 text-chart-1"></ng-icon>
+        <p class="text-sm text-muted-foreground">Storage Used</p>
+      </div>
+      <p class="mt-2 text-2xl font-bold text-card-foreground">
+        {{ (totalSize() / 1024).toFixed(1) }} MB
+      </p>
+    </div>
+    <div class="rounded-xl border border-border bg-card p-4 shadow-sm">
+      <div class="flex items-center gap-2">
+        <ng-icon name="lucideCalendar" class="h-5 w-5 text-chart-2"></ng-icon>
+        <p class="text-sm text-muted-foreground">Last Upload</p>
+      </div>
+      <p class="mt-2 text-2xl font-bold text-card-foreground">Today</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-1 gap-3">
+      <div class="relative flex-1 sm:max-w-xs">
+        <ng-icon name="lucideSearch" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"></ng-icon>
+        <input
+          type="text"
+          placeholder="Search documents..."
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          class="w-full rounded-lg border border-border bg-input py-2 pl-9 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+        />
+      </div>
+      <select
+        [ngModel]="selectedCategory()"
+        (ngModelChange)="selectedCategory.set($event)"
+        class="rounded-lg border border-border bg-input px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+      >
+        @for (cat of categories; track cat.id) {
+          <option [value]="cat.id">
+            {{ cat.label }}
+          </option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <!-- Documents Grid -->
+  @if (filteredDocuments().length === 0) {
+    <div class="rounded-xl border border-border bg-card p-8 text-center">
+      <ng-icon name="lucideFileText" class="mx-auto h-12 w-12 text-muted-foreground/50 flex"></ng-icon>
+      <p class="mt-4 text-lg font-medium text-card-foreground">
+        No documents found
+      </p>
+      <p class="mt-1 text-sm text-muted-foreground">
+        Try adjusting your search or filters
+      </p>
+    </div>
+  } @else {
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      @for (doc of filteredDocuments(); track doc.id) {
+        <div class="group rounded-xl border border-border bg-card p-4 shadow-sm transition-all hover:shadow-md flex flex-col justify-between">
+          <div>
+            <div class="flex items-start justify-between">
+              <div
+                class="flex h-12 w-12 items-center justify-center rounded-lg"
+                [ngClass]="typeColors[doc.type]"
+              >
+                <ng-icon [name]="typeIcons[doc.type]" class="h-6 w-6"></ng-icon>
+              </div>
+              <button class="rounded-md p-1 opacity-0 transition-opacity hover:bg-muted group-hover:opacity-100">
+                <ng-icon name="lucideMoreHorizontal" class="h-4 w-4 text-muted-foreground"></ng-icon>
+              </button>
+            </div>
+            <div class="mt-3">
+              <p class="truncate font-medium text-card-foreground" [title]="doc.name">
+                {{ doc.name }}
+              </p>
+              <div class="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                <span>{{ doc.size }}</span>
+                <span>•</span>
+                <span>{{ doc.uploadedAt | date:'mediumDate' }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center gap-2">
+            <button class="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-border py-1.5 text-xs font-medium text-card-foreground transition-colors hover:bg-muted">
+              <ng-icon name="lucideEye" class="h-3.5 w-3.5"></ng-icon>
+              View
+            </button>
+            <button class="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-border py-1.5 text-xs font-medium text-card-foreground transition-colors hover:bg-muted">
+              <ng-icon name="lucideDownload" class="h-3.5 w-3.5"></ng-icon>
+              Download
+            </button>
+            <button class="flex items-center justify-center rounded-lg border border-border p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-destructive">
+              <ng-icon name="lucideTrash2" class="h-3.5 w-3.5"></ng-icon>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
