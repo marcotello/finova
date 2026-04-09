@@ -1,0 +1,133 @@
+<div class="p-4 lg:p-6">
+  <!-- Header -->
+  <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-foreground">Accounts</h1>
+      <p class="text-sm text-muted-foreground">
+        Manage your connected accounts and wallets
+      </p>
+    </div>
+    <div class="flex items-center gap-3">
+      <button
+        (click)="toggleBalances()"
+        class="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-card-foreground hover:bg-muted"
+      >
+        @if (showBalances()) {
+          <ng-icon name="lucideEyeOff" class="h-4 w-4"></ng-icon>
+        } @else {
+          <ng-icon name="lucideEye" class="h-4 w-4"></ng-icon>
+        }
+        {{ showBalances() ? "Hide" : "Show" }} Balances
+      </button>
+      <button class="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+        <ng-icon name="lucidePlus" class="h-4 w-4"></ng-icon>
+        Add Account
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="mb-6 grid gap-4 sm:grid-cols-3">
+    @for (type of accountTypes; track type) {
+      <div class="rounded-xl border border-border bg-card p-4 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-lg"
+            [ngClass]="type === 'cash' ? 'bg-chart-1' : type === 'credit' ? 'bg-destructive' : 'bg-chart-2'"
+          >
+            <ng-icon [name]="typeIcons[type]" class="h-5 w-5 text-primary-foreground"></ng-icon>
+          </div>
+          <div>
+            <p class="text-sm text-muted-foreground">
+              {{ typeLabels[type] }}
+            </p>
+            <p
+              class="text-xl font-bold"
+              [ngClass]="totals[type] < 0 ? 'text-destructive' : 'text-card-foreground'"
+            >
+              @if (showBalances()) {
+                {{ totals[type] | currency:'MXN':'symbol-narrow':'1.2-2' }}
+              } @else {
+                ••••••
+              }
+            </p>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Account Groups -->
+  <div class="space-y-6">
+    @for (type of accountTypes; track type) {
+      <div>
+        <div class="mb-3 flex items-center gap-2">
+          <ng-icon [name]="typeIcons[type]" class="h-5 w-5 text-muted-foreground"></ng-icon>
+          <h2 class="text-lg font-semibold text-foreground">
+            {{ typeLabels[type] }}
+          </h2>
+          <span class="ml-auto text-sm text-muted-foreground">
+            {{ groupedAccounts[type].length }} account{{ groupedAccounts[type].length !== 1 ? "s" : "" }}
+          </span>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          @for (account of groupedAccounts[type]; track account.id) {
+            <div class="group rounded-xl border border-border bg-card p-4 shadow-sm transition-all hover:shadow-md">
+              <div class="flex items-start justify-between">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-10 w-10 items-center justify-center rounded-lg"
+                    [ngClass]="account.color"
+                  >
+                    @if (account.type === 'cash') {
+                      <ng-icon name="lucideLandmark" class="h-5 w-5 text-primary-foreground"></ng-icon>
+                    } @else if (account.type === 'credit') {
+                      <ng-icon name="lucideCreditCard" class="h-5 w-5 text-primary-foreground"></ng-icon>
+                    } @else {
+                      <ng-icon name="lucideBadgeDollarSign" class="h-5 w-5 text-primary-foreground"></ng-icon>
+                    }
+                  </div>
+                  <div>
+                    <p class="font-medium text-card-foreground">
+                      {{ account.name }}
+                    </p>
+                    <div class="flex items-center gap-1 text-sm text-muted-foreground">
+                      <ng-icon name="lucideBuilding2" class="h-3 w-3"></ng-icon>
+                      {{ account.institution }}
+                    </div>
+                  </div>
+                </div>
+                <button class="rounded-md p-1 opacity-0 transition-opacity hover:bg-muted group-hover:opacity-100">
+                  <ng-icon name="lucideMoreHorizontal" class="h-4 w-4 text-muted-foreground"></ng-icon>
+                </button>
+              </div>
+              <div class="mt-4 flex items-end justify-between">
+                <div>
+                  <p class="text-xs text-muted-foreground">
+                    @if (account.lastFour) {
+                      •••• {{ account.lastFour }}
+                    }
+                  </p>
+                  <p
+                    class="text-xl font-bold"
+                    [ngClass]="account.balance < 0 ? 'text-destructive' : 'text-card-foreground'"
+                  >
+                    @if (showBalances()) {
+                      @if (account.balance < 0) { - }
+                      {{ account.balance | currency:account.currency:'symbol-narrow':'1.2-2' | slice:(account.balance < 0 ? 2 : 0) }}
+                    } @else {
+                      ••••••
+                    }
+                  </p>
+                </div>
+                <span class="rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
+                  {{ account.currency }}
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
