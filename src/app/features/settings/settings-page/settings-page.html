@@ -1,0 +1,216 @@
+<div class="p-4 lg:p-6">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-foreground">Settings</h1>
+    <p class="text-sm text-muted-foreground">
+      Manage your app preferences and account settings
+    </p>
+  </div>
+
+  <div class="space-y-6">
+    <!-- Appearance -->
+    <div class="rounded-xl border border-border bg-card shadow-sm">
+      <div class="flex items-center gap-3 border-b border-border p-4">
+        <ng-icon name="lucidePalette" class="h-5 w-5 text-primary"></ng-icon>
+        <h2 class="font-semibold text-card-foreground">Appearance</h2>
+      </div>
+      <div class="p-4">
+        <p class="mb-3 text-sm text-muted-foreground">
+          Choose your preferred theme
+        </p>
+        <div class="flex gap-3">
+          @for (t of themes; track t) {
+            <button
+              (click)="setTheme(t)"
+              class="flex flex-1 flex-col items-center gap-2 rounded-lg border p-4 transition-colors"
+              [ngClass]="
+                theme() === t
+                  ? 'border-primary bg-primary/5'
+                  : 'border-border hover:bg-muted'
+              "
+            >
+              @if (t === 'light') {
+                <ng-icon name="lucideSun" class="h-6 w-6"></ng-icon>
+              } @else if (t === 'dark') {
+                <ng-icon name="lucideMoon" class="h-6 w-6"></ng-icon>
+              } @else {
+                <ng-icon name="lucideSmartphone" class="h-6 w-6"></ng-icon>
+              }
+              <span class="text-sm font-medium capitalize">{{ t }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Language & Region -->
+    <div class="rounded-xl border border-border bg-card shadow-sm">
+      <div class="flex items-center gap-3 border-b border-border p-4">
+        <ng-icon name="lucideGlobe" class="h-5 w-5 text-primary"></ng-icon>
+        <h2 class="font-semibold text-card-foreground">Language & Region</h2>
+      </div>
+      <div class="p-4">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label class="mb-2 block text-sm font-medium text-card-foreground">
+              Language
+            </label>
+            <select
+              [ngModel]="language()"
+              (ngModelChange)="language.set($event)"
+              class="w-full rounded-lg border border-border bg-input px-3 py-2.5 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="es-MX">Español (Mexico)</option>
+              <option value="en-US">English (US)</option>
+              <option value="pt-BR">Português (Brasil)</option>
+            </select>
+          </div>
+          <div>
+            <label class="mb-2 block text-sm font-medium text-card-foreground">
+              Default Currency
+            </label>
+            <select
+              [ngModel]="currency()"
+              (ngModelChange)="currency.set($event)"
+              class="w-full rounded-lg border border-border bg-input px-3 py-2.5 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="MXN">MXN - Mexican Peso</option>
+              <option value="USD">USD - US Dollar</option>
+              <option value="EUR">EUR - Euro</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="rounded-xl border border-border bg-card shadow-sm">
+      <div class="flex items-center gap-3 border-b border-border p-4">
+        <ng-icon name="lucideBell" class="h-5 w-5 text-primary"></ng-icon>
+        <h2 class="font-semibold text-card-foreground">Notifications</h2>
+      </div>
+      <div class="divide-y divide-border">
+        @for (notification of notifications(); track notification.id) {
+          <div class="flex items-center justify-between p-4">
+            <div>
+              <p class="font-medium text-card-foreground">
+                {{ notification.label }}
+              </p>
+              <p class="text-sm text-muted-foreground">
+                {{ notification.description }}
+              </p>
+            </div>
+            <button
+              (click)="toggleNotification(notification.id)"
+              class="relative h-6 w-11 rounded-full transition-colors"
+              [ngClass]="notification.enabled ? 'bg-primary' : 'bg-muted'"
+            >
+              <span
+                class="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform"
+                [ngClass]="notification.enabled ? 'left-5' : 'left-0.5'"
+              ></span>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Security -->
+    <div class="rounded-xl border border-border bg-card shadow-sm">
+      <div class="flex items-center gap-3 border-b border-border p-4">
+        <ng-icon name="lucideShield" class="h-5 w-5 text-primary"></ng-icon>
+        <h2 class="font-semibold text-card-foreground">Security</h2>
+      </div>
+      <div class="divide-y divide-border">
+        @for (setting of security(); track setting.id) {
+          <div class="flex items-center justify-between p-4">
+            <div>
+              <p class="font-medium text-card-foreground">
+                {{ setting.label }}
+              </p>
+              <p class="text-sm text-muted-foreground">
+                {{ setting.description }}
+              </p>
+            </div>
+            <button
+              (click)="toggleSecurity(setting.id)"
+              class="relative h-6 w-11 rounded-full transition-colors"
+              [ngClass]="setting.enabled ? 'bg-primary' : 'bg-muted'"
+            >
+              <span
+                class="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform"
+                [ngClass]="setting.enabled ? 'left-5' : 'left-0.5'"
+              ></span>
+            </button>
+          </div>
+        }
+        <button class="flex w-full items-center justify-between p-4 text-left hover:bg-muted/50">
+          <div>
+            <p class="font-medium text-card-foreground">
+              Change Password
+            </p>
+            <p class="text-sm text-muted-foreground">
+              Update your account password
+            </p>
+          </div>
+          <ng-icon name="lucideChevronRight" class="h-5 w-5 text-muted-foreground"></ng-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Connected Accounts -->
+    <div class="rounded-xl border border-border bg-card shadow-sm">
+      <div class="flex items-center gap-3 border-b border-border p-4">
+        <ng-icon name="lucideCreditCard" class="h-5 w-5 text-primary"></ng-icon>
+        <h2 class="font-semibold text-card-foreground">Connected Accounts</h2>
+      </div>
+      <div class="divide-y divide-border">
+        <button class="flex w-full items-center justify-between p-4 text-left hover:bg-muted/50">
+          <div>
+            <p class="font-medium text-card-foreground">
+              Manage Bank Connections
+            </p>
+            <p class="text-sm text-muted-foreground">
+              Add or remove connected bank accounts
+            </p>
+          </div>
+          <ng-icon name="lucideChevronRight" class="h-5 w-5 text-muted-foreground"></ng-icon>
+        </button>
+        <button class="flex w-full items-center justify-between p-4 text-left hover:bg-muted/50">
+          <div>
+            <p class="font-medium text-card-foreground">
+              Payment Methods
+            </p>
+            <p class="text-sm text-muted-foreground">
+              Manage your payment cards and methods
+            </p>
+          </div>
+          <ng-icon name="lucideChevronRight" class="h-5 w-5 text-muted-foreground"></ng-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="rounded-xl border border-destructive/30 bg-card shadow-sm">
+      <div class="flex items-center gap-3 border-b border-destructive/30 p-4">
+        <ng-icon name="lucideLock" class="h-5 w-5 text-destructive"></ng-icon>
+        <h2 class="font-semibold text-destructive">Danger Zone</h2>
+      </div>
+      <div class="p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="font-medium text-card-foreground">
+              Delete Account
+            </p>
+            <p class="text-sm text-muted-foreground">
+              Permanently delete your account and all data
+            </p>
+          </div>
+          <button class="rounded-lg border border-destructive px-4 py-2 text-sm font-medium text-destructive hover:bg-destructive/10">
+            Delete Account
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
