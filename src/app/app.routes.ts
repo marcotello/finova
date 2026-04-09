@@ -39,6 +39,10 @@ export const routes: Routes = [
             {
                 path: 'documents',
                 loadComponent: () => import('./features/documents/documents-page/documents-page').then(m => m.DocumentsPage)
+            },
+            {
+                path: 'finny',
+                loadComponent: () => import('./features/finny/finny-page/finny-page').then(m => m.FinnyPage)
             }
         ]
     },
