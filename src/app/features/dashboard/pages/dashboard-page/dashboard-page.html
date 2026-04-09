@@ -1,1 +1,172 @@
-<p>dashboard-page works!</p>
+<div class="p-4 lg:p-6">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-foreground">Dashboard</h1>
+    <p class="text-sm text-muted-foreground">
+      Welcome back! Here's your financial overview.
+    </p>
+  </div>
+
+  <!-- Net Worth Cards -->
+  <div class="mb-6 grid gap-4 sm:grid-cols-2">
+    @for (item of netWorthData; track item.currency) {
+      <div class="rounded-xl border border-border bg-card p-5 shadow-sm">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <ng-icon name="lucideDollarSign" class="h-5 w-5 text-primary"></ng-icon>
+            </div>
+            <span class="text-sm font-medium text-muted-foreground">
+              Net Worth ({{ item.currency }})
+            </span>
+          </div>
+          <button class="rounded-md p-1 hover:bg-muted">
+            <ng-icon name="lucideMoreHorizontal" class="h-4 w-4 text-muted-foreground"></ng-icon>
+          </button>
+        </div>
+        <div class="mt-4">
+          <p class="text-3xl font-bold text-card-foreground">
+            {{ item.symbol }}{{ item.amount | number:'1.2-2' }}
+          </p>
+          <div class="mt-2 flex items-center gap-1">
+            @if (item.isPositive) {
+              <ng-icon name="lucideArrowUpRight" class="h-4 w-4 text-chart-1"></ng-icon>
+            } @else {
+              <ng-icon name="lucideArrowDownRight" class="h-4 w-4 text-destructive"></ng-icon>
+            }
+            <span class="text-sm font-medium" [ngClass]="item.isPositive ? 'text-chart-1' : 'text-destructive'">
+              {{ item.change }}%
+            </span>
+            <span class="text-sm text-muted-foreground">vs last month</span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Account Summary -->
+  <div class="mb-6">
+    <h2 class="mb-4 text-lg font-semibold text-foreground">
+      Account Summary
+    </h2>
+    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      @for (account of accountSummary; track account.name) {
+        <div class="rounded-xl border border-border bg-card p-4 shadow-sm">
+          <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg" [ngClass]="account.color">
+              <ng-icon [name]="account.icon" class="h-5 w-5 text-primary-foreground"></ng-icon>
+            </div>
+            <div>
+              <p class="text-sm text-muted-foreground">{{ account.name }}</p>
+              <p class="text-lg font-semibold" [ngClass]="account.amount < 0 ? 'text-destructive' : 'text-card-foreground'">
+                {{ account.amount | currency:'MXN':'symbol-narrow':'1.2-2' }}
+              </p>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-2">
+    <!-- Recent Transactions -->
+    <div class="rounded-xl border border-border bg-card shadow-sm">
+      <div class="flex items-center justify-between border-b border-border p-4">
+        <h2 class="font-semibold text-card-foreground">
+          Recent Transactions
+        </h2>
+        <button class="text-sm text-primary hover:underline">
+          View all
+        </button>
+      </div>
+      <div class="divide-y divide-border">
+        @for (tx of recentTransactions; track tx.id) {
+          <div class="flex items-center justify-between p-4 transition-colors hover:bg-muted/50">
+            <div class="flex items-center gap-3">
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-lg">
+                {{ tx.icon }}
+              </div>
+              <div>
+                <p class="font-medium text-card-foreground">
+                  {{ tx.description }}
+                </p>
+                <p class="text-sm text-muted-foreground">{{ tx.category }}</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="font-semibold" [ngClass]="tx.amount < 0 ? 'text-card-foreground' : 'text-chart-1'">
+                @if (tx.amount > 0) { + }
+                {{ tx.amount | currency:'MXN':'symbol-narrow':'1.2-2' }}
+              </p>
+              <p class="text-sm text-muted-foreground">{{ tx.date }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Budget Alerts -->
+    <div class="rounded-xl border border-border bg-card shadow-sm">
+      <div class="flex items-center justify-between border-b border-border p-4">
+        <h2 class="font-semibold text-card-foreground">Budget Alerts</h2>
+        <button class="text-sm text-primary hover:underline">
+          Manage budgets
+        </button>
+      </div>
+      <div class="p-4">
+        <div class="space-y-4">
+          @for (budget of budgetAlerts; track budget.category) {
+            <div>
+              <div class="mb-2 flex items-center justify-between">
+                <span class="text-sm font-medium text-card-foreground">
+                  {{ budget.category }}
+                </span>
+                <span class="text-sm text-muted-foreground">
+                  {{ budget.spent | currency:'MXN':'symbol-narrow':'1.2-2' }} / {{ budget.limit | currency:'MXN':'symbol-narrow':'1.2-2' }}
+                </span>
+              </div>
+              <div class="relative h-2 overflow-hidden rounded-full bg-muted">
+                <div
+                  class="absolute left-0 top-0 h-full rounded-full transition-all"
+                  [ngClass]="{
+                    'bg-destructive': budget.percentage >= 90,
+                    'bg-yellow-500': budget.percentage >= 80 && budget.percentage < 90,
+                    'bg-chart-1': budget.percentage < 80
+                  }"
+                  [style.width.%]="budget.percentage"
+                ></div>
+              </div>
+              @if (budget.percentage >= 80) {
+                <p class="mt-1 text-xs text-destructive">
+                  {{ budget.percentage >= 90 ? 'Almost at limit!' : 'Approaching limit' }}
+                </p>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="mt-6 grid grid-cols-2 gap-4">
+          <div class="rounded-lg bg-muted/50 p-3">
+            <div class="flex items-center gap-2">
+              <ng-icon name="lucideTrendingUp" class="h-4 w-4 text-chart-1"></ng-icon>
+              <span class="text-xs text-muted-foreground">Income</span>
+            </div>
+            <p class="mt-1 text-lg font-semibold text-card-foreground">
+              {{ 85000 | currency:'MXN':'symbol-narrow':'1.2-2' }}
+            </p>
+          </div>
+          <div class="rounded-lg bg-muted/50 p-3">
+            <div class="flex items-center gap-2">
+              <ng-icon name="lucideTrendingDown" class="h-4 w-4 text-destructive"></ng-icon>
+              <span class="text-xs text-muted-foreground">Expenses</span>
+            </div>
+            <p class="mt-1 text-lg font-semibold text-card-foreground">
+              {{ 52340 | currency:'MXN':'symbol-narrow':'1.2-2' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
