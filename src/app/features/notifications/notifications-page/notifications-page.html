@@ -1,0 +1,154 @@
+<div class="p-4 lg:p-6">
+  <!-- Header -->
+  <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <div class="flex items-center gap-3">
+        <h1 class="text-2xl font-bold text-foreground">Notifications</h1>
+        @if (unreadCount() > 0) {
+          <span class="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
+            {{ unreadCount() }}
+          </span>
+        }
+      </div>
+      <p class="text-sm text-muted-foreground">
+        Stay updated on your financial activity
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <button
+        (click)="markAllAsRead()"
+        class="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-card-foreground hover:bg-muted"
+      >
+        <ng-icon name="lucideCheck" class="h-4 w-4"></ng-icon>
+        Mark all read
+      </button>
+      <button
+        (click)="clearAll()"
+        class="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-card-foreground hover:bg-muted"
+      >
+        <ng-icon name="lucideTrash2" class="h-4 w-4"></ng-icon>
+        Clear all
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex items-center gap-2">
+      <button
+        (click)="filter.set('all')"
+        class="rounded-full px-4 py-1.5 text-sm font-medium transition-colors"
+        [ngClass]="
+          filter() === 'all'
+            ? 'bg-primary text-primary-foreground'
+            : 'bg-muted text-muted-foreground hover:bg-muted/80'
+        "
+      >
+        All
+      </button>
+      <button
+        (click)="filter.set('unread')"
+        class="rounded-full px-4 py-1.5 text-sm font-medium transition-colors"
+        [ngClass]="
+          filter() === 'unread'
+            ? 'bg-primary text-primary-foreground'
+            : 'bg-muted text-muted-foreground hover:bg-muted/80'
+        "
+      >
+        Unread ({{ unreadCount() }})
+      </button>
+    </div>
+    <div class="flex items-center gap-2">
+      <ng-icon name="lucideFilter" class="h-4 w-4 text-muted-foreground"></ng-icon>
+      <select
+        [ngModel]="categoryFilter()"
+        (ngModelChange)="categoryFilter.set($event)"
+        class="rounded-lg border border-border bg-input px-3 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+      >
+        <option value="all">All Categories</option>
+        <option value="budget">Budget Alerts</option>
+        <option value="transaction">Transactions</option>
+        <option value="goal">Goals</option>
+        <option value="system">System</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Notifications List -->
+  <div class="space-y-3">
+    @if (filteredNotifications().length === 0) {
+      <div class="rounded-xl border border-border bg-card p-8 text-center">
+        <ng-icon name="lucideBell" class="mx-auto h-12 w-12 text-muted-foreground/50 flex"></ng-icon>
+        <p class="mt-4 text-lg font-medium text-card-foreground">
+          No notifications
+        </p>
+        <p class="mt-1 text-sm text-muted-foreground">
+          You're all caught up! Check back later for updates.
+        </p>
+      </div>
+    } @else {
+      @for (notification of filteredNotifications(); track notification.id) {
+        <div
+          class="group rounded-xl border bg-card p-4 shadow-sm transition-all hover:shadow-md"
+          [ngClass]="notification.read ? 'border-border' : 'border-primary/30 bg-primary/5'"
+        >
+          <div class="flex gap-4">
+            <div
+              class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
+              [ngClass]="typeColors[notification.type]"
+            >
+              <ng-icon [name]="typeIcons[notification.type]" class="h-5 w-5"></ng-icon>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <p class="font-medium" [ngClass]="notification.read ? 'text-card-foreground' : 'text-foreground'">
+                      {{ notification.title }}
+                    </p>
+                    @if (!notification.read) {
+                      <span class="h-2 w-2 rounded-full bg-primary"></span>
+                    }
+                  </div>
+                  <p class="mt-1 text-sm text-muted-foreground">
+                    {{ notification.message }}
+                  </p>
+                  <div class="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
+                    <div class="flex items-center gap-1">
+                      <ng-icon [name]="categoryIcons[notification.category]" class="h-3 w-3"></ng-icon>
+                      <span class="capitalize">
+                        {{ notification.category }}
+                      </span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <ng-icon name="lucideCalendar" class="h-3 w-3"></ng-icon>
+                      <span>{{ formatTimeAgo(notification.timestamp) }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                  @if (!notification.read) {
+                    <button
+                      (click)="markAsRead(notification.id)"
+                      class="rounded-md p-1.5 hover:bg-muted"
+                      title="Mark as read"
+                    >
+                      <ng-icon name="lucideCheck" class="h-4 w-4 text-muted-foreground"></ng-icon>
+                    </button>
+                  }
+                  <button
+                    (click)="deleteNotification(notification.id)"
+                    class="rounded-md p-1.5 hover:bg-muted"
+                    title="Delete"
+                  >
+                    <ng-icon name="lucideTrash2" class="h-4 w-4 text-muted-foreground"></ng-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>

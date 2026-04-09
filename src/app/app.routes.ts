@@ -43,6 +43,10 @@ export const routes: Routes = [
             {
                 path: 'finny',
                 loadComponent: () => import('./features/finny/finny-page/finny-page').then(m => m.FinnyPage)
+            },
+            {
+                path: 'notifications',
+                loadComponent: () => import('./features/notifications/notifications-page/notifications-page').then(m => m.NotificationsPage)
             }
         ]
     },
