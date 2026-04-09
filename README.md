@@ -26,6 +26,22 @@ For a complete list of available schematics (such as `components`, `directives`,
 ng generate --help
 ```
 
+## API Generation
+
+This project uses an OpenAPI generator to synchronize with the backend API. To generate the API client and DTOs, run:
+
+```bash
+npm run api:generate
+```
+
+By default, it fetches the specification from `http://localhost:3000/api-json`. To use a custom URL (e.g., if your backend is on port 3001), use:
+
+```bash
+bash scripts/generate-api.sh --url http://localhost:3001/api-json
+```
+
+For more advanced options, refer to [scripts/README.md](scripts/README.md).
+
 ## Building
 
 To build the project run:
