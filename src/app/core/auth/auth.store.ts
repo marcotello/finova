@@ -1,4 +1,4 @@
-import { inject } from '@angular/core';
+import { inject, computed } from '@angular/core';
 import {
   signalStore,
   withState,
@@ -6,11 +6,7 @@ import {
   withMethods,
   patchState,
 } from '@ngrx/signals';
-import { computed } from '@angular/core';
-import { AuthService } from '../api/api/auth.service';
-import { AuthResponseDto } from '../api/model/authResponseDto';
-import { LoginDto } from '../api/model/loginDto';
-import { RegisterDto } from '../api/model/registerDto';
+import { AuthService, LoginDto, AuthResponseDto, RegisterDto} from '../api';
 import { firstValueFrom } from 'rxjs';
 
 export interface AuthState {
