@@ -1,0 +1,185 @@
+<div class="p-4 lg:p-6">
+  <!-- Header -->
+  <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-foreground">Budgets</h1>
+      <p class="text-sm text-muted-foreground">
+        Track your spending limits by category
+      </p>
+    </div>
+    <button class="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+      <ng-icon name="lucidePlus" class="h-4 w-4"></ng-icon>
+      Create Budget
+    </button>
+  </div>
+
+  <!-- Overall Summary -->
+  <div class="mb-6 rounded-xl border border-border bg-card p-5 shadow-sm">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p class="text-sm text-muted-foreground">
+          Total Monthly Budget
+        </p>
+        <p class="text-3xl font-bold text-card-foreground">
+          {{ totalSpent | currency:'MXN':'symbol-narrow':'1.0-0' }} 
+          <span class="text-lg font-normal text-muted-foreground">
+            / {{ totalLimit | currency:'MXN':'symbol-narrow':'1.0-0' }}
+          </span>
+        </p>
+      </div>
+      <div class="flex items-center gap-3">
+        <div
+          class="flex items-center gap-2 rounded-full px-3 py-1.5"
+          [ngClass]="overallPercentage >= 80 ? 'bg-destructive/10' : 'bg-chart-1/10'"
+        >
+          @if (overallPercentage >= 80) {
+            <ng-icon name="lucideAlertTriangle" class="h-4 w-4 text-destructive"></ng-icon>
+          } @else {
+            <ng-icon name="lucideCheckCircle" class="h-4 w-4 text-chart-1"></ng-icon>
+          }
+          <span
+            class="text-sm font-medium"
+            [ngClass]="overallPercentage >= 80 ? 'text-destructive' : 'text-chart-1'"
+          >
+            {{ overallPercentage }}% used
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="mt-4">
+      <div class="relative h-3 overflow-hidden rounded-full bg-muted">
+        <div
+          class="absolute left-0 top-0 h-full rounded-full transition-all"
+          [ngClass]="getStatusColor(overallPercentage)"
+          [style.width.%]="Math.min(overallPercentage, 100)"
+        ></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Warning Budgets -->
+  @if (warningBudgets.length > 0) {
+    <div class="mb-6">
+      <div class="mb-3 flex items-center gap-2">
+        <ng-icon name="lucideAlertTriangle" class="h-5 w-5 text-destructive"></ng-icon>
+        <h2 class="text-lg font-semibold text-foreground">
+          Needs Attention
+        </h2>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        @for (budget of warningBudgets; track budget.id) {
+          <!-- Need to evaluate percentage and status text cleanly -->
+          <div class="group rounded-xl border border-destructive/30 bg-card p-4 shadow-sm">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center gap-3">
+                <div
+                  class="flex h-10 w-10 items-center justify-center rounded-lg"
+                  [ngClass]="budget.color"
+                >
+                  <ng-icon [name]="budget.icon" class="h-5 w-5 text-primary-foreground"></ng-icon>
+                </div>
+                <div>
+                  <p class="font-medium text-card-foreground">
+                    {{ budget.category }}
+                  </p>
+                  <p class="text-sm font-medium" [ngClass]="getStatusText(getPercentage(budget.spent, budget.limit)).color">
+                    {{ getStatusText(getPercentage(budget.spent, budget.limit)).text }}
+                  </p>
+                </div>
+              </div>
+              <div class="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                <button class="rounded-md p-1.5 hover:bg-muted">
+                  <ng-icon name="lucideEdit2" class="h-4 w-4 text-muted-foreground"></ng-icon>
+                </button>
+                <button class="rounded-md p-1.5 hover:bg-muted">
+                  <ng-icon name="lucideTrash2" class="h-4 w-4 text-muted-foreground"></ng-icon>
+                </button>
+              </div>
+            </div>
+            <div class="mt-4">
+              <div class="flex items-end justify-between">
+                <p class="text-2xl font-bold text-card-foreground">
+                  {{ budget.spent | currency:'MXN':'symbol-narrow':'1.0-0' }}
+                </p>
+                <p class="text-sm text-muted-foreground">
+                  of {{ budget.limit | currency:'MXN':'symbol-narrow':'1.0-0' }}
+                </p>
+              </div>
+              <div class="mt-2">
+                <div class="relative h-2 overflow-hidden rounded-full bg-muted">
+                  <div
+                    class="absolute left-0 top-0 h-full rounded-full transition-all"
+                    [ngClass]="getStatusColor(getPercentage(budget.spent, budget.limit))"
+                    [style.width.%]="Math.min(getPercentage(budget.spent, budget.limit), 100)"
+                  ></div>
+                </div>
+              </div>
+              <p class="mt-2 text-sm text-muted-foreground">
+                {{ Math.max(budget.limit - budget.spent, 0) | currency:'MXN':'symbol-narrow':'1.0-0' }} remaining
+              </p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- On Track Budgets -->
+  <div>
+    <div class="mb-3 flex items-center gap-2">
+      <ng-icon name="lucideCheckCircle" class="h-5 w-5 text-chart-1"></ng-icon>
+      <h2 class="text-lg font-semibold text-foreground">On Track</h2>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      @for (budget of onTrackBudgets; track budget.id) {
+        <div class="group rounded-xl border border-border bg-card p-4 shadow-sm">
+          <div class="flex items-start justify-between">
+            <div class="flex items-center gap-3">
+              <div
+                class="flex h-10 w-10 items-center justify-center rounded-lg"
+                [ngClass]="budget.color"
+              >
+                <ng-icon [name]="budget.icon" class="h-5 w-5 text-primary-foreground"></ng-icon>
+              </div>
+              <div>
+                <p class="font-medium text-card-foreground">
+                  {{ budget.category }}
+                </p>
+                <p class="text-sm text-chart-1">On track</p>
+              </div>
+            </div>
+            <div class="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+              <button class="rounded-md p-1.5 hover:bg-muted">
+                <ng-icon name="lucideEdit2" class="h-4 w-4 text-muted-foreground"></ng-icon>
+              </button>
+              <button class="rounded-md p-1.5 hover:bg-muted">
+                <ng-icon name="lucideTrash2" class="h-4 w-4 text-muted-foreground"></ng-icon>
+              </button>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-end justify-between">
+              <p class="text-2xl font-bold text-card-foreground">
+                {{ budget.spent | currency:'MXN':'symbol-narrow':'1.0-0' }}
+              </p>
+              <p class="text-sm text-muted-foreground">
+                of {{ budget.limit | currency:'MXN':'symbol-narrow':'1.0-0' }}
+              </p>
+            </div>
+            <div class="mt-2">
+              <div class="relative h-2 overflow-hidden rounded-full bg-muted">
+                <div
+                  class="absolute left-0 top-0 h-full rounded-full bg-chart-1 transition-all"
+                  [style.width.%]="getPercentage(budget.spent, budget.limit)"
+                ></div>
+              </div>
+            </div>
+            <p class="mt-2 text-sm text-muted-foreground">
+              {{ budget.limit - budget.spent | currency:'MXN':'symbol-narrow':'1.0-0' }} remaining
+            </p>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
