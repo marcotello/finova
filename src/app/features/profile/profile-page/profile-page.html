@@ -1,0 +1,224 @@
+<div class="p-4 lg:p-6">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-foreground">Profile</h1>
+    <p class="text-sm text-muted-foreground">
+      Manage your personal information
+    </p>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-3">
+    <!-- Profile Card -->
+    <div class="lg:col-span-1">
+      <div class="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div class="flex flex-col items-center">
+          <div class="relative">
+            <div class="flex h-24 w-24 items-center justify-center rounded-full bg-primary text-3xl font-bold text-primary-foreground">
+              {{ formData().firstName[0] }}
+              {{ formData().lastName[0] }}
+            </div>
+            <button class="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-muted-foreground hover:bg-muted">
+              <ng-icon name="lucideCamera" class="h-4 w-4"></ng-icon>
+            </button>
+          </div>
+          <h2 class="mt-4 text-xl font-semibold text-card-foreground">
+            {{ formData().firstName }} {{ formData().lastName }}
+          </h2>
+          <p class="text-sm text-muted-foreground">{{ formData().email }}</p>
+
+          <div class="mt-6 w-full space-y-3">
+            <div class="flex items-center gap-3 text-sm">
+              <ng-icon name="lucideMapPin" class="h-4 w-4 text-muted-foreground"></ng-icon>
+              <span class="text-card-foreground">{{ formData().country }}</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm">
+              <ng-icon name="lucideCalendar" class="h-4 w-4 text-muted-foreground"></ng-icon>
+              <span class="text-card-foreground">
+                Member since Jan 2024
+              </span>
+            </div>
+            <div class="flex items-center gap-3 text-sm">
+              <ng-icon name="lucideShield" class="h-4 w-4 text-chart-1"></ng-icon>
+              <span class="text-chart-1">Verified Account</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="mt-4 rounded-xl border border-border bg-card p-4 shadow-sm">
+        <h3 class="mb-3 font-medium text-card-foreground">
+          Account Stats
+        </h3>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-muted-foreground">Connected Accounts</span>
+            <span class="font-medium text-card-foreground">8</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-muted-foreground">Active Budgets</span>
+            <span class="font-medium text-card-foreground">6</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-muted-foreground">Savings Goals</span>
+            <span class="font-medium text-card-foreground">4</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-muted-foreground">Transactions This Month</span>
+            <span class="font-medium text-card-foreground">127</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Form -->
+    <div class="lg:col-span-2">
+      <div class="rounded-xl border border-border bg-card shadow-sm">
+        <div class="flex items-center justify-between border-b border-border p-4">
+          <h3 class="font-semibold text-card-foreground">
+            Personal Information
+          </h3>
+          <button
+            (click)="toggleEdit()"
+            class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+            [ngClass]="
+              isEditing()
+                ? 'bg-muted text-muted-foreground'
+                : 'bg-primary text-primary-foreground hover:bg-primary/90'
+            "
+          >
+            {{ isEditing() ? 'Cancel' : 'Edit Profile' }}
+          </button>
+        </div>
+
+        <div class="p-6">
+          <div class="grid gap-6 sm:grid-cols-2">
+            <div>
+              <label class="mb-2 block text-sm font-medium text-card-foreground">
+                First Name
+              </label>
+              <div class="relative">
+                <ng-icon name="lucideUser" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"></ng-icon>
+                <input
+                  type="text"
+                  [ngModel]="formData().firstName"
+                  (ngModelChange)="handleChange('firstName', $event)"
+                  [disabled]="!isEditing()"
+                  class="w-full rounded-lg border border-border bg-input py-2.5 pl-10 pr-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="mb-2 block text-sm font-medium text-card-foreground">
+                Last Name
+              </label>
+              <div class="relative">
+                <ng-icon name="lucideUser" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"></ng-icon>
+                <input
+                  type="text"
+                  [ngModel]="formData().lastName"
+                  (ngModelChange)="handleChange('lastName', $event)"
+                  [disabled]="!isEditing()"
+                  class="w-full rounded-lg border border-border bg-input py-2.5 pl-10 pr-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="mb-2 block text-sm font-medium text-card-foreground">
+                Email Address
+              </label>
+              <div class="relative">
+                <ng-icon name="lucideMail" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"></ng-icon>
+                <input
+                  type="email"
+                  [ngModel]="formData().email"
+                  (ngModelChange)="handleChange('email', $event)"
+                  [disabled]="!isEditing()"
+                  class="w-full rounded-lg border border-border bg-input py-2.5 pl-10 pr-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="mb-2 block text-sm font-medium text-card-foreground">
+                Phone Number
+              </label>
+              <div class="relative">
+                <ng-icon name="lucidePhone" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"></ng-icon>
+                <input
+                  type="tel"
+                  [ngModel]="formData().phone"
+                  (ngModelChange)="handleChange('phone', $event)"
+                  [disabled]="!isEditing()"
+                  class="w-full rounded-lg border border-border bg-input py-2.5 pl-10 pr-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="mb-2 block text-sm font-medium text-card-foreground">
+                Date of Birth
+              </label>
+              <div class="relative">
+                <ng-icon name="lucideCalendar" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"></ng-icon>
+                <input
+                  type="date"
+                  [ngModel]="formData().dateOfBirth"
+                  (ngModelChange)="handleChange('dateOfBirth', $event)"
+                  [disabled]="!isEditing()"
+                  class="w-full rounded-lg border border-border bg-input py-2.5 pl-10 pr-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="mb-2 block text-sm font-medium text-card-foreground">
+                Country
+              </label>
+              <div class="relative">
+                <ng-icon name="lucideMapPin" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"></ng-icon>
+                <select
+                  [ngModel]="formData().country"
+                  (ngModelChange)="handleChange('country', $event)"
+                  [disabled]="!isEditing()"
+                  class="w-full appearance-none rounded-lg border border-border bg-input py-2.5 pl-10 pr-4 text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <option value="Mexico">Mexico</option>
+                  <option value="United States">United States</option>
+                  <option value="Canada">Canada</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="mb-2 block text-sm font-medium text-card-foreground">
+                Address
+              </label>
+              <div class="relative">
+                <ng-icon name="lucideMapPin" class="absolute left-3 top-3 h-4 w-4 text-muted-foreground"></ng-icon>
+                <textarea
+                  [ngModel]="formData().address"
+                  (ngModelChange)="handleChange('address', $event)"
+                  [disabled]="!isEditing()"
+                  rows="2"
+                  class="w-full rounded-lg border border-border bg-input py-2.5 pl-10 pr-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          @if (isEditing()) {
+            <div class="mt-6 flex justify-end">
+              <button class="flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+                <ng-icon name="lucideSave" class="h-4 w-4"></ng-icon>
+                Save Changes
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
