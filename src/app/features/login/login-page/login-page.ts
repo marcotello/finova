@@ -1,7 +1,6 @@
 import { Component, signal, inject } from '@angular/core';
-import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideMail,
@@ -16,7 +15,7 @@ import { GlobalStateService } from '../../../core/global-store/global-state.serv
 
 @Component({
   selector: 'app-login-page',
-  imports: [NgClass, NgIcon, FormsModule, RouterLink],
+  imports: [NgIcon, FormsModule, RouterLink],
   templateUrl: './login-page.html',
   styleUrl: './login-page.css',
   providers: [
@@ -32,6 +31,9 @@ import { GlobalStateService } from '../../../core/global-store/global-state.serv
   ]
 })
 export class LoginPage {
+
+  private readonly router = inject(Router);
+
   globalState = inject(GlobalStateService);
 
   formData = signal({
@@ -39,7 +41,7 @@ export class LoginPage {
     password: '',
     rememberMe: false
   });
-  
+
   isLoading = signal(false);
   showPassword = signal(false);
 
@@ -54,7 +56,7 @@ export class LoginPage {
   onSubmit(e: Event) {
     e.preventDefault();
     const data = this.formData();
-    
+
     if (!data.email || !data.password) return;
 
     this.isLoading.set(true);
@@ -64,6 +66,7 @@ export class LoginPage {
       this.isLoading.set(false);
       console.log('Login attempt with', data);
       // Here you would inject Router and router.navigate(['/'])
+      this.router.navigate(['/'])
     }, 1000);
   }
 }

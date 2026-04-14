@@ -26,8 +26,8 @@ interface ProfileFormData {
 
 const INITIAL_DATA: ProfileFormData = {
   firstName: "Carlos",
-  lastName: "Rodriguez",
-  email: "carlos.rodriguez@email.com",
+  lastName: "Slim",
+  email: "carlos.slim@carso.com.mx",
   phone: "+52 55 1234 5678",
   dateOfBirth: "1990-05-15",
   address: "Av. Reforma 123, Polanco, CDMX",

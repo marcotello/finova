@@ -1,7 +1,7 @@
 import { Component, signal, computed, inject } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideUser,
@@ -36,6 +36,9 @@ import { GlobalStateService } from '../../../core/global-store/global-state.serv
   ]
 })
 export class SignupPage {
+
+  private readonly router = inject(Router);
+
   globalState = inject(GlobalStateService);
 
   step = signal(1);
@@ -79,7 +82,7 @@ export class SignupPage {
   onSubmit(e: Event) {
     e.preventDefault();
     const data = this.formData();
-    
+
     // Switch to step 2 if on step 1 and valid
     if (this.step() === 1) {
       if (!data.name || !data.email) return;
@@ -98,6 +101,7 @@ export class SignupPage {
     setTimeout(() => {
       this.isLoading.set(false);
       console.log('Signup config:', data);
+      this.router.navigate(['/'])
     }, 1500);
   }
 }
