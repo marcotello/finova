@@ -64,7 +64,7 @@ export const routes: Routes = [
         children: [
             {
                 path: 'login',
-                loadComponent: () => import('./features/auth/login/pages/login-page/login-page').then(m => m.LoginPage)
+                loadComponent: () => import('./features/login/login-page/login-page').then(m => m.LoginPage)
             }
         ]
     },
