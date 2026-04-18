@@ -67,5 +67,20 @@ export const AuthStore = signalStore(
         });
       }
     },
+    async refreshSession() {
+      patchState(store, { isLoading: true, error: null });
+      try {
+        const user = await firstValueFrom(authService.authControllerRefreshV1());
+        patchState(store, { user, isLoading: false });
+        return user;
+      } catch (error: any) {
+        patchState(store, {
+          user: null,
+          error: error.message || 'Session refresh failed',
+          isLoading: false,
+        });
+        throw error;
+      }
+    },
   }))
 );
