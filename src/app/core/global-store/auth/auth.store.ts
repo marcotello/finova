@@ -68,8 +68,10 @@ export const AuthStore = signalStore(
         });
       }
     },
-    async refreshSession() {
-      patchState(store, { isLoading: true, error: null });
+    async refreshSession(silent = false) {
+      if (!silent) {
+        patchState(store, { isLoading: true, error: null });
+      }
       try {
         const user = await firstValueFrom(authService.authControllerRefreshV1());
         patchState(store, { user, isLoading: false });
@@ -77,8 +79,10 @@ export const AuthStore = signalStore(
       } catch (error: any) {
         patchState(store, {
           user: null,
-          error: error.error?.message || error.message || 'Session refresh failed',
           isLoading: false,
+          ...(!silent && {
+            error: error.error?.message || error.message || 'Session refresh failed',
+          }),
         });
         throw error;
       }
@@ -89,7 +93,7 @@ export const AuthStore = signalStore(
       // Silently try to restore the session from an existing HTTP-only refresh cookie.
       // Errors are intentionally swallowed — an unauthenticated start is perfectly valid.
       try {
-        await store.refreshSession();
+        await store.refreshSession(true);
       } catch {
         // No active session — nothing to do.
       }

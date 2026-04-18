@@ -67,7 +67,7 @@ describe('authInterceptor', () => {
     // Wait for the async refreshSession to be called and resolved
     await new Promise(resolve => setTimeout(resolve, 10));
 
-    expect(authStore.refreshSession).toHaveBeenCalled();
+    expect(authStore.refreshSession).toHaveBeenCalledWith(true);
 
     // After refreshSession, it should retry the original request
     const retryReq = httpTestingController.expectOne('/api/data');
