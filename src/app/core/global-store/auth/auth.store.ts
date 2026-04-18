@@ -4,6 +4,7 @@ import {
   withState,
   withComputed,
   withMethods,
+  withHooks,
   patchState,
 } from '@ngrx/signals';
 import { AuthService, LoginDto, AuthResponseDto, RegisterDto} from '../../api';
@@ -36,7 +37,7 @@ export const AuthStore = signalStore(
         patchState(store, { user, isLoading: false });
       } catch (error: any) {
         patchState(store, {
-          error: error.message || 'Login failed',
+          error: error.error?.message || error.message || 'Login failed',
           isLoading: false,
         });
       }
@@ -50,7 +51,7 @@ export const AuthStore = signalStore(
         patchState(store, { isLoading: false });
       } catch (error: any) {
         patchState(store, {
-          error: error.message || 'Registration failed',
+          error: error.error?.message || error.message || 'Registration failed',
           isLoading: false,
         });
       }
@@ -76,11 +77,22 @@ export const AuthStore = signalStore(
       } catch (error: any) {
         patchState(store, {
           user: null,
-          error: error.message || 'Session refresh failed',
+          error: error.error?.message || error.message || 'Session refresh failed',
           isLoading: false,
         });
         throw error;
       }
     },
-  }))
+  })),
+  withHooks({
+    async onInit(store) {
+      // Silently try to restore the session from an existing HTTP-only refresh cookie.
+      // Errors are intentionally swallowed — an unauthenticated start is perfectly valid.
+      try {
+        await store.refreshSession();
+      } catch {
+        // No active session — nothing to do.
+      }
+    },
+  })
 );

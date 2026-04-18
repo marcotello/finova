@@ -10,8 +10,10 @@ import {
   lucideEyeOff,
   lucideSun,
   lucideMoon,
+  lucideAlertCircle,
 } from '@ng-icons/lucide';
 import { GlobalStateService } from '../../../core/global-store/global-state.service';
+import { AuthStore } from '../../../core/global-store/auth/auth.store';
 
 @Component({
   selector: 'app-login-page',
@@ -27,14 +29,15 @@ import { GlobalStateService } from '../../../core/global-store/global-state.serv
       lucideEyeOff,
       lucideSun,
       lucideMoon,
+      lucideAlertCircle,
     })
   ]
 })
 export class LoginPage {
 
   private readonly router = inject(Router);
-
-  globalState = inject(GlobalStateService);
+  readonly authStore = inject(AuthStore);
+  readonly globalState = inject(GlobalStateService);
 
   formData = signal({
     email: '',
@@ -42,8 +45,12 @@ export class LoginPage {
     rememberMe: false
   });
 
-  isLoading = signal(false);
   showPassword = signal(false);
+
+  // Expose store signals as concise aliases for the template
+  readonly isLoading = this.authStore.isLoading;
+  readonly error = this.authStore.error;
+
 
   togglePasswordVisibility() {
     this.showPassword.update(v => !v);
@@ -53,20 +60,17 @@ export class LoginPage {
     this.formData.update(prev => ({ ...prev, [field]: value }));
   }
 
-  onSubmit(e: Event) {
+  async onSubmit(e: Event) {
     e.preventDefault();
-    const data = this.formData();
+    const { email, password } = this.formData();
 
-    if (!data.email || !data.password) return;
+    if (!email || !password) return;
 
-    this.isLoading.set(true);
+    await this.authStore.login({ email, password });
 
-    // Mock API call
-    setTimeout(() => {
-      this.isLoading.set(false);
-      console.log('Login attempt with', data);
-      // Here you would inject Router and router.navigate(['/'])
-      this.router.navigate(['/'])
-    }, 1000);
+    // Navigate on success — the store sets user synchronously before we reach this line.
+    if (this.authStore.isAuthenticated()) {
+      this.router.navigate(['/dashboard']);
+    }
   }
 }
